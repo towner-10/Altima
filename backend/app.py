@@ -1,3 +1,7 @@
+#Progression is (more sources)(coachroach)(machine model)
+#Good design was to specify output of all our work etc 
+#Team need whiteboard obv
+
 #!/usr/bin/python3
 from tkinter import Y
 from flask import Flask, request
@@ -15,8 +19,11 @@ def homeRoute():
         'message': 'Server is running'
     }
 
+
+#Start here
+
 """
-Example json object request:
+Example of json object front end sends:
 {
   "x_coord": "2.44",
   "y-coord": "3.55",
@@ -25,15 +32,21 @@ Example json object request:
 
 """
 
-@app.route('/bestEnergy', methods=['POST'])
-def bestEnergy():
+# Calculate the best source
+@app.route('/location', methods=['POST'])
+def location():
     request_data = request.get_json()
 
     x = request_data['x_coord']
     y = request_data['y_coord']
     elevation = request_data['elevation']
 
-    #call relevent functions
+    #Fetching weather data from API
+    
+
+
+    #call relevent functions & pass said data
+    #But what weather or data does the wind calculator need?
 
     #convert python dictionary to json
     rankingJson = json.dump(ranking)
@@ -41,6 +54,18 @@ def bestEnergy():
     #returns a json object of best 
     return rankingJson
 
+ #if calculator functions return json just directly return that
+   
+
+
+"""
+Example of json object the /location function returns
+
+
+
+"""
+
+#CALCULATOR FUNCTIONS
     
 def compareSources():
     #compare prices of all energy sources
@@ -51,20 +76,10 @@ def compareSources():
 
     #return the dictionary 
     
+def windSource():
 
-def solarPrice
-    #return the price 
-
-def hydroPrice
-
-def windPrice
 
 
 # returns the ranked list of energy
 #--------------------
-
-# Saving the request to the database
-
 # Calculating energy sources at this location
-
-# Saving the request details 
