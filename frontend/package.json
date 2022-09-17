@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.2",
     "@mapbox/mapbox-gl-geocoder": "^5.0.1",
     "axios": "^0.27.2",
     "mapbox-gl": "^2.10.0",
