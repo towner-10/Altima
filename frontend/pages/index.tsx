@@ -23,7 +23,7 @@ const Home: NextPage = () => {
     <>
       <div className="bg-babyPowder h-screen">
         <Head>
-          <title>Altima</title>
+          <title>ALTIMA</title>
           <meta name="description" content="Find the best alternative to alternative energy!" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
