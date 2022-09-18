@@ -27,4 +27,20 @@ def postRequest(userID, lat, long):
 # date literal datetime.date(2005, 11, 18)
 
 def getRequest(userID):
-    
+    with conn.cursor() as cur:
+        cur.execute(f"""
+        SELECT 
+            timeposted
+            userid
+            lat
+            long
+        
+        FROM
+            defaultdb
+
+        WHERE
+            userid = {userID}
+        """, )
+    conn.commit()
+
+
