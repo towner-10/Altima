@@ -13,38 +13,112 @@ def fetchData(lng, lat):
     yearAgo = date - datetime.timedelta(days=365)
 
     r = requests.get(f'https://archive-api.open-meteo.com/v1/era5?latitude={lat}&longitude={lng}&start_date={yearAgo.strftime("%Y-%m-%d")}&end_date={date.strftime("%Y-%m-%d")}&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,precipitation_sum,rain_sum,snowfall_sum,precipitation_hours,windspeed_10m_max,windgusts_10m_max,winddirection_10m_dominant&timezone=auto')
-    json = r.json()
+    
+    if r.ok == False:
+        pass
+    
+    return r.json()
 
-    print(json)
+# Calculate temperature score
+def calcTemperatureScore(minList, maxList):
 
-    # Number of datapoints being fetched
-    datapoints = len(json['daily']['time'])
+    minTemp = minList[0]
+    maxTemp = maxList[0]
 
-    # Print average max and min temp
-    print(sum(json['daily']['temperature_2m_min'])/datapoints)
-    print(sum(json['daily']['temperature_2m_max'])/datapoints)
+    for x in minList:
+        if x < minTemp:
+            minTemp = x
+
+    for x in maxList:
+        if x > maxTemp:
+            maxTemp = x
+
+    averageTemp = sum(minList + maxList) / len(minList + maxList)
+
+    return 1 - (maxTemp - averageTemp) / (maxTemp - minTemp) * 0.5
+
+# Calculate humidity score
+def calcHumidityScore(minTempList, minApparentList, maxTempList, maxApparentList):
+
+    minHumidity = minApparentList[0] - minTempList[0]
+    maxHumidity = maxApparentList[0] - maxTempList[0]
+
+    humidityList = []
+
+    for x in range(len(minApparentList)):
+        humidityList.append(minApparentList[x] - minTempList[x])
+        if (minApparentList[x] - minTempList[x]) < minHumidity:
+            minHumidity = minApparentList[x] - minTempList[x]
+    
+    for x in range(len(maxApparentList)):
+        humidityList.append(maxApparentList[x] - maxTempList[x])
+        if (maxApparentList[x] - maxTempList[x]) > maxHumidity:
+            maxHumidity = maxApparentList[x] - maxTempList[x]
+
+    averageHumidity = sum(humidityList) / len(humidityList)
+    
+    return 1 - (maxHumidity - averageHumidity) / (maxHumidity - minHumidity) * 0.5
+
+# Calculate wind score
+def calcWindScore(speedList, gustList):
+
+    minWind = speedList[0]
+    maxWind = gustList[0]
+
+    for x in speedList:
+        if x < minWind:
+            minWind = x
+
+    for x in gustList:
+        if x > maxWind:
+            maxWind = x
+
+    averageWind = sum(speedList + gustList) / len(speedList + gustList)
+
+    return (maxWind - averageWind) / (maxWind - minWind) * 0.5 + 0.5
 
 # Latitude 43.466667
 # Longitude -80.516670
-# Test query: http://localhost:5000/test?lng=-80.516670&lat=43.466667
-@app.route('/test', methods=['GET'])
-def test():
+# Test query: http://localhost:8080/query?lng=-80.516670&lat=43.466667
+@app.route('/query', methods=['GET'])
+def query():
     lng = request.args.get('lng')
     lat = request.args.get('lat')
 
-    fetchData(lng, lat)
+    data = fetchData(lng, lat)
+
+    if data == None:
+        return {
+            'status': 500,
+            'message': {
+                'tempScore': 0,
+                'humidityScore': 0,
+                'windScore': 0,
+                'solar': 0,
+                'turbine': 0,
+                'solarKWH': 0,
+                'turbineKWH': 0
+            }
+        }
+
+    tempScore = calcTemperatureScore(data['daily']['temperature_2m_min'], data['daily']['temperature_2m_max'])
+    humidityScore = calcHumidityScore(data['daily']['temperature_2m_min'], data['daily']['apparent_temperature_min'], data['daily']['temperature_2m_max'], data['daily']['apparent_temperature_max'])
+    windScore = calcWindScore(data['daily']['windspeed_10m_max'], data['daily']['windgusts_10m_max'])
+    solarScore = 0.3*(tempScore) + 0.6*(humidityScore) + 0.1*(windScore)
+    turbineScore = 0.1*(tempScore) + 0.3*(humidityScore) + 0.6*(windScore)
 
     return {
         'status': 200,
-        'message': "Check console for output rn"
-    }
-
-# Calculate the best source
-@app.route('/location', methods=['GET'])
-def location():
-    return {
-        'status': 501,
-        'message': 'Not implemented'
+        'message': {
+            'tempScore': tempScore,
+            'humidityScore': humidityScore,
+            'windScore': windScore,
+            'solar': solarScore,
+            'turbine': turbineScore,
+            # Offset for daylight
+            'solarKWH': 3000 / solarScore * 1.55,
+            'turbineKWH': 5000 / turbineScore
+        }
     }
 
 # Default route

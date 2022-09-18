@@ -15,7 +15,8 @@ module.exports = {
         artichoke: {
           300: '#9AA68C',
           400: '#899878',
-          500: '#5D6850'
+          500: '#5D6850',
+          600: '#48513E'
         },
         charlestonGreen: '#222725',
         smokyBlack: '#121113'
