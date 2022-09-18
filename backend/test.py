@@ -9,9 +9,10 @@ conn = psycopg2.connect(url)
 #SQL database structure: userID, timePosted, lat, long
 """ MAKE TABLE (only once)
 with conn.cursor() as cur:
-    cur.execute("CREATE TABLE requests (userID varchar, timePosted date, lat integer, long integer);")
+    cur.execute("CREATE TABLE requestList (userID varchar, timePosted date, lat double, long double);")
 
 """
+#LAT AND LONG ARE DOUBLE OR FLOATS, edit below AND above 
 
 # Call this function in the request route
 def postRequest(userID, lat, long):
@@ -19,28 +20,19 @@ def postRequest(userID, lat, long):
 
     with conn.cursor() as cur:
         cur.execute("""
-        INSERT INTO some_table (a_string, a_date, an_int, an_int)
+        INSERT INTO requestList (a_string, a_date, a_double, a_double)
         VALUES (%s, %s, %d, %d);
         """, 
         (userID, date, lat, long))
     conn.commit()
 # date literal datetime.date(2005, 11, 18)
 
+
 def getRequest(userID):
     with conn.cursor() as cur:
-        cur.execute(f"""
-        SELECT 
-            timeposted
-            userid
-            lat
-            long
-        
-        FROM
-            defaultdb
-
-        WHERE
-            userid = {userID}
-        """, )
+        query = cur.execute(f""" SELECT * FROM requestList WHERE userid = {userID} """)
     conn.commit()
+
+    #returns table as json object
 
 
