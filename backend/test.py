@@ -12,7 +12,6 @@ with conn.cursor() as cur:
     cur.execute("CREATE TABLE requestList (userID varchar, timePosted date, lat double, long double);")
 
 """
-#LAT AND LONG ARE DOUBLE OR FLOATS, edit below AND above 
 
 # Call this function in the request route
 def postRequest(userID, lat, long):
@@ -32,6 +31,7 @@ def getRequest(userID):
     with conn.cursor() as cur:
         query = cur.execute(f""" SELECT * FROM requestList WHERE userid = {userID} """)
     conn.commit()
+
 
     #returns table as json object
 
