@@ -1,8 +1,7 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Component } from 'react';
-import Map from 'react-map-gl';
-import * as React from 'react';
-import { useState } from 'react';
+import Map, { MapRef } from 'react-map-gl';
+import { useState, useRef } from 'react';
 import { useControl, Marker, MarkerProps, ControlPosition } from 'react-map-gl';
 import MapboxGeocoder, { GeocoderOptions } from '@mapbox/mapbox-gl-geocoder';
 import Pin from './pin';
@@ -54,6 +53,40 @@ export class PointSelectorMap extends Component<{ style: any, markerEvent: (e: o
             </Map>
         );
     }
+}
+
+export function CheckMap(props: { location: any, style: any }) {
+
+    const mapRef = useRef<MapRef>(null);
+
+    return (
+        <Map
+            ref={mapRef}
+            initialViewState={{
+                longitude: -79.347,
+                latitude: 43.651,
+                zoom: 5
+            }}
+            mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+            style={props.style}
+            mapStyle="mapbox://styles/mapbox/satellite-v9"
+            onLoad={() => {
+                mapRef.current?.flyTo({
+                    center: {
+                        lng: props.location.longitude,
+                        lat: props.location.latitude
+                    }, animate: true, zoom: 10, duration: 2000
+                })
+            }}>
+            <Marker
+                longitude={props.location.longitude}
+                latitude={props.location.latitude}
+                anchor="bottom"
+            >
+                <Pin size={20} />
+            </Marker>
+        </Map>
+    );
 }
 
 function GeocoderControl(props: GeocoderControlProps) {

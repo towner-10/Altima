@@ -4,8 +4,12 @@ from flask_cors import CORS
 import requests
 import datetime
 
+from database import Database
+
 app = Flask(__name__)
 CORS(app)
+
+database = Database()
 
 # Fetch weather data from API
 def fetchData(lng, lat):
@@ -121,6 +125,30 @@ def query():
         }
     }
 
+@app.route('/save', methods=['POST'])
+def save():
+    user = request.args.get('user')
+    lng = request.args.get('lng')
+    lat = request.args.get('lat')
+
+    database.postRequest(user, lat, lng)
+
+    return {
+        'status': 200,
+        'message': 'Sucessfully put user request into database'
+    }
+
+@app.route('/get/requests', methods=['GET'])
+def getUserRequests():
+    user = request.args.get('user')
+
+    res = database.getUserRequests(user)
+
+    return {
+        'status': 200,
+        'message': res
+    }
+
 # Default route
 @app.route('/', methods=['GET'])
 def homeRoute():
@@ -128,6 +156,3 @@ def homeRoute():
         'status': 200,
         'message': 'Server is running'
     }
-
-if __name__ == "__main__":
-    fetchData()

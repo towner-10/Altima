@@ -5,13 +5,14 @@ import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { LoginButton, LoginIcons } from "../components/loginButtons";
 import axios from 'axios'
+import { useUser } from '@auth0/nextjs-auth0'
 
 interface Location {
   lng: number,
   lat: number
 }
 
-interface Data {
+export interface Data {
   message: {
     tempScore: number,
     humidityScore: number,
@@ -24,8 +25,6 @@ interface Data {
   status: number
 }
 
-
-
 const Home: NextPage = () => {
 
   const [openNoLocation, setOpenNoLocation] = useState(false);
@@ -33,6 +32,7 @@ const Home: NextPage = () => {
   const [openCompare, setOpenCompare] = useState(false);
   const [location, setLocation] = useState<Location | undefined>(undefined);
   const [data, setData] = useState<Data | undefined>(undefined);
+  const { user } = useUser();
 
   const markerUpdate = (e: Location) => {
     setLocation(e);
@@ -349,6 +349,18 @@ const Home: NextPage = () => {
                               <h2 className='h-3 w-24 rounded-full bg-artichoke-300 animate-pulse'></h2>
                             }
                           </div>
+                        </div>
+                        <div className='py-6 px-12 flex flex-row justify-center'>
+                          <button className="block w-full md:w-32 hover:transition-all focus:transition-all text-babyPowder bg-artichoke-400 hover:bg-artichoke-300 focus:ring-4 focus:outline-none focus:ring-artichoke-500 font-medium rounded-full text-sm px-5 py-2.5 text-center h-12" type="button" onClick={(e) => {
+                            if (process.env.NEXT_PUBLIC_API_URL === undefined || user?.email === undefined || location === undefined) return;
+
+                            axios.post(process.env.NEXT_PUBLIC_API_URL + `/save?user=${user?.email}&lng=${location.lng}&lat=${location.lat}`).then(res => {
+                              setOpenCompare(false);
+                              setData(undefined);
+                            });
+                          }}>
+                            Save
+                          </button>
                         </div>
                       </div>
                     </div>
