@@ -98,7 +98,7 @@ const Account: NextPage = () => {
 
             <div className=" flex flex-col items-center justify-center bg-babyPowder">
                 {data.message.map((item: any, index: any) => (
-                    <div className="px-6 mt-6 py-2 w-96 bg-artichoke-300 rounded-full flex flex-row justify-between items-center" id={index}>
+                    <div className="px-6 mt-6 py-2 w-96 bg-artichoke-300 rounded-full flex flex-row justify-between items-center" key={index}>
                         <div className="py-2 text-babyPowder">{moment(item[1]).format("MMM, DD YYYY - LT")}</div>
                         <Link href={`/request/check?lng=${item[3]}&lat=${item[2]}`}>
                             <button className="col-span-1 block w-full md:w-40 hover:transition-all focus:transition-all text-babyPowder bg-artichoke-600 hover:bg-artichoke-500 focus:ring-4 focus:outline-none focus:ring-charlestonGreen font-medium rounded-full px-5 py-2.5 text-center h-12" type="button">
