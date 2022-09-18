@@ -38,7 +38,7 @@ export class PointSelectorMap extends Component<{ style: any, markerEvent: (e: o
 
     render() {
         return (
-            <Map reuseMaps
+            <Map
                 initialViewState={{
                     longitude: -79.347,
                     latitude: 43.651,

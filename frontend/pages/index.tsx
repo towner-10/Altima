@@ -320,7 +320,7 @@ const Home: NextPage = () => {
                         </div>
                       }
 
-                      <div className="mt-2">
+                      {user && <div className="mt-2">
                         <div className="flex flex-col px-6 text-charlestonGreen text-sm">
                           <div className='flex flex-row justify-between'>
                             <h2>Humidity Rating</h2>
@@ -362,7 +362,38 @@ const Home: NextPage = () => {
                             Save
                           </button>
                         </div>
-                      </div>
+                      </div>}
+                      {user === undefined && <div className="mt-2 pb-6">
+                        <div className="flex flex-col px-6 text-charlestonGreen text-sm">
+                          <div className='flex flex-row justify-between'>
+                            <h2>Humidity Rating</h2>
+                            {data !== undefined &&
+                              <h2>{(data.message.humidityScore * 10).toFixed(2)} / 10</h2>
+                            }
+                            {data === undefined &&
+                              <h2 className='h-3 w-24 rounded-full bg-artichoke-300 animate-pulse'></h2>
+                            }
+                          </div>
+                          <div className='flex flex-row justify-between'>
+                            <h2>Temperature Rating</h2>
+                            {data !== undefined &&
+                              <h2>{(data.message.tempScore * 10).toFixed(2)} / 10</h2>
+                            }
+                            {data === undefined &&
+                              <h2 className='h-3 w-24 rounded-full bg-artichoke-300 animate-pulse'></h2>
+                            }
+                          </div>
+                          <div className='flex flex-row justify-between'>
+                            <h2>Wind Rating</h2>
+                            {data !== undefined &&
+                              <h2>{(data.message.windScore * 10).toFixed(2)} / 10</h2>
+                            }
+                            {data === undefined &&
+                              <h2 className='h-3 w-24 rounded-full bg-artichoke-300 animate-pulse'></h2>
+                            }
+                          </div>
+                        </div>
+                      </div>}
                     </div>
                   </div>
                 </Dialog.Panel>

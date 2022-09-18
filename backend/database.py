@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import psycopg2
 import os
 
@@ -7,10 +7,10 @@ class Database:
         self.conn = psycopg2.connect(os.environ.get('DATABASE_URL'))
 
     def postRequest(self, userID, lat, long):
-        date = datetime.now()
+        date = datetime.now(timezone.utc)
 
         with self.conn.cursor() as cur:
-            cur.execute("INSERT INTO requests (userid, timeposted, lat, long) VALUES (%s, %s, %s, %s);", (userID, date.isoformat(), lat, long))
+            cur.execute("INSERT INTO requests (userid, timeposted, lat, long) VALUES (%s, %s, %s, %s);", (userID, date, lat, long))
             cur.close()
         
         self.conn.commit()
@@ -26,3 +26,9 @@ class Database:
 
         return res
     
+    def clearRequestTable(self):
+        with self.conn.cursor() as cur:
+            cur.execute("DELETE FROM requests;")
+            cur.close()
+        
+        self.conn.commit()
